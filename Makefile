@@ -23,7 +23,7 @@ target/x86_64-unknown-linux-musl/release/ktmpl:
 
 .PHONY: docker-build
 docker-build:
-	docker build -t inquicker/ktmpl -t inquicker/ktmpl:$(TAG) .
+	docker build -t jimmycuadra/ktmpl -t jimmycuadra/ktmpl:$(TAG) .
 
 dist: clean dist/sha256sums.txt.sig docker-build
 

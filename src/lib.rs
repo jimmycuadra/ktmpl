@@ -1,7 +1,7 @@
 //! the [Templates + Parameterization proposal](https://github.com/kubernetes/kubernetes/blob/master/docs/proposals/templates.md).
 //!
 //! The crate ships with a command line utility and a library for programmatically processing
-//! manifest templates. See the [README](https://github.com/InQuicker/ktmpl) for documentation for
+//! manifest templates. See the [README](https://github.com/jimmycuadra/ktmpl) for documentation for
 //! the command line utility, and a general overview of the Kubernetes template system.
 //!
 //! Here is a simple example of using the library:

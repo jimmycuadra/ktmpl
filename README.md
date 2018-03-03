@@ -116,18 +116,18 @@ cargo install ktmpl
 
 ### Precompiled binary
 
-[Releases](https://github.com/InQuicker/ktmpl/releases)
+[Releases](https://github.com/jimmycuadra/ktmpl/releases)
 
 ### Docker
 
 ```
-docker pull inquicker/ktmpl
+docker pull jimmycuadra/ktmpl
 ```
 
 ### Building from source
 
 1. Install the appropriate version of [Rust](https://www.rust-lang.org/) for your system.
-2. Run `git clone git@github.com:InQuicker/ktmpl.git`.
+2. Run `git clone git@github.com:jimmycuadra/ktmpl.git`.
 3. Inside the freshly cloned repository, run `cargo install --path .`.
 
 Make sure Cargo's bin directory is added to your PATH environment variable.
@@ -138,7 +138,7 @@ To package the current release for distribution, update `TAG` in the Makefile an
 Release artifacts will be written to the `dist` directory.
 Your GPG secret key will be required to sign `sha256sums.txt`.
 
-Docker images for `inquicker/ktmpl` and `inquicker/ktmpl:$TAG` will be created, but you must push them manually.
+Docker images for `jimmycuadra/ktmpl` and `jimmycuadra/ktmpl:$TAG` will be created, but you must push them manually.
 `cargo publish` must be run manually to release to crates.io.
 
 ## Legal

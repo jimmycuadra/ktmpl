@@ -54,14 +54,13 @@
 //!     assert_eq!(
 //!         processed_template.lines().map(|l| l.trim_right()).collect::<Vec<&str>>().join("\n"),
 //!         r#"---
-//! apiVersion: v1
 //! kind: Service
+//! apiVersion: v1
 //! metadata:
 //!   name: mongo
 //! spec:
 //!   ports:
-//!     -
-//!       name: db
+//!     - name: db
 //!       protocol: TCP
 //!       targetPort: 3000
 //!   selector:
@@ -157,12 +156,12 @@ parameters:
         assert_eq!(
             processed_template.lines().map(|l| l.trim_right()).collect::<Vec<&str>>().join("\n"),
             r#"---
-apiVersion: v1
-data:
-  config.yml: dXNlcm5hbWU6ICJjYXJsIgpwYXNzd29yZDogIm5hcmJsZSIK
 kind: Secret
+apiVersion: v1
 metadata:
   name: webapp
+data:
+  config.yml: dXNlcm5hbWU6ICJjYXJsIgpwYXNzd29yZDogIm5hcmJsZSIK
 type: Opaque"#
         );
     }
@@ -230,21 +229,20 @@ parameters:
         assert_eq!(
             processed_template.lines().map(|l| l.trim_right()).collect::<Vec<&str>>().join("\n"),
             r#"---
-apiVersion: v1
 kind: Service
+apiVersion: v1
 metadata:
   name: mongodb
 spec:
   ports:
-    -
-      name: mongo
+    - name: mongo
       protocol: TCP
       targetPort: 27017
   selector:
     name: mongodb
 ---
-apiVersion: v1
 kind: ReplicationController
+apiVersion: v1
 metadata:
   name: mongodb
 spec:
@@ -258,23 +256,18 @@ spec:
         name: mongodb
     spec:
       containers:
-        -
-          env:
-            -
-              name: MONGODB_USER
-              value: carl
-            -
-              name: MONGODB_PASSWORD
-              value: c2VjcmV0
-            -
-              name: MONGODB_DATABASE
-              value: sampledb
+        - name: mongodb
           image: "docker.io/centos/mongodb-26-centos7"
-          name: mongodb
           ports:
-            -
-              containerPort: 27017
-              protocol: TCP"#
+            - containerPort: 27017
+              protocol: TCP
+          env:
+            - name: MONGODB_USER
+              value: carl
+            - name: MONGODB_PASSWORD
+              value: c2VjcmV0
+            - name: MONGODB_DATABASE
+              value: sampledb"#
         );
     }
 }

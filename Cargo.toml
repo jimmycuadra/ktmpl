@@ -1,12 +1,12 @@
 [package]
 authors = ["Jimmy Cuadra <jimmy@jimmycuadra.com>"]
 description = "Parameterized templates for Kubernetes manifests."
-homepage = "https://github.com/InQuicker/ktmpl"
+homepage = "https://github.com/jimmycuadra/ktmpl"
 keywords = ["kubernetes"]
 license = "MIT"
 name = "ktmpl"
 readme = "README.md"
-repository = "https://github.com/InQuicker/ktmpl"
+repository = "https://github.com/jimmycuadra/ktmpl"
 version = "0.7.0"
 
 [[bin]]
@@ -14,8 +14,8 @@ doc = false
 name = "ktmpl"
 
 [dependencies]
-base64 = "0.4.0"
-clap = "2.20.5"
-lazy_static = "0.2.4"
-regex = "0.2.1"
-yaml-rust = "0.3.5"
+base64 = "0.9.0"
+clap = "2.30.0"
+lazy_static = "1.0.0"
+regex = "0.2.6"
+yaml-rust = "0.4.0"

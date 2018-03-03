@@ -115,7 +115,7 @@ impl Template {
 
 fn maybe_base64_encode_secret(secrets: &Secrets, object: &mut Yaml)
 -> Result<bool, String> {
-    let mut hash = match object {
+    let hash = match object {
         &mut Yaml::Hash(ref mut hash) => hash,
         _ => return Ok(false),
     };

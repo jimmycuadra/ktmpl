@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::error::Error;
 use std::fs::File;
-use std::io::Read;
+use std::io::{ErrorKind, Read};
 use std::str::FromStr;
 
 use base64::encode;
@@ -41,7 +41,12 @@ pub type ParameterValues = HashMap<String, ParameterValue>;
 
 /// Loads `ParameterValues` from a file.
 pub fn parameter_values_from_file(file_path: &str) -> Result<ParameterValues, String> {
-    let mut file = File::open(file_path).map_err(|err| err.description().to_owned())?;
+    let mut file = File::open(file_path).map_err(|err| {
+        match err.kind() {
+            ErrorKind::NotFound => format!("File not found: {}", file_path),
+            _ => err.description().to_owned(),
+        }
+    })?;
 
     let mut contents = String::new();
     file.read_to_string(&mut contents).map_err(|err| err.description().to_owned())?;

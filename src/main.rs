@@ -4,7 +4,7 @@ extern crate ktmpl;
 use std::collections::{HashMap};
 use std::error::Error;
 use std::fs::File;
-use std::io::{Read, stdin};
+use std::io::{ErrorKind, Read, stdin};
 use std::process::exit;
 
 use clap::{App, AppSettings, Arg, Values};
@@ -113,7 +113,12 @@ fn real_main() -> Result<(), String> {
     if filename == "-" {
         stdin().read_to_string(&mut template_data).map_err(|err| err.description().to_owned())?;
     } else {
-        let mut file = File::open(filename).map_err(|err| err.description().to_owned())?;
+        let mut file = File::open(filename).map_err(|err| {
+            match err.kind() {
+                ErrorKind::NotFound => format!("File not found: {}", filename),
+                _ => err.description().to_owned(),
+            }
+        })?;
         file.read_to_string(&mut template_data).map_err(|err| err.description().to_owned())?;
     }
 

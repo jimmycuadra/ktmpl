@@ -1,8 +1,9 @@
-use yaml::Yaml;
-use yaml::yaml::{Array, Hash};
+use lazy_static::lazy_static;
 use regex::{Captures, Regex};
+use yaml_rust::Yaml;
+use yaml_rust::yaml::{Array, Hash};
 
-use parameter::ParamMap;
+use crate::parameter::ParamMap;
 
 pub fn process_yaml(yaml: &mut Yaml, parameters: &ParamMap) -> Option<Yaml> {
     match yaml {

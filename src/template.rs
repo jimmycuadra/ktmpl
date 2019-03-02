@@ -1,12 +1,14 @@
 use std::error::Error;
 
 use base64::encode;
-use yaml::yaml::Hash;
-use yaml::{EmitError, Yaml, YamlEmitter, YamlLoader};
+use yaml_rust::yaml::Hash;
+use yaml_rust::{EmitError, Yaml, YamlEmitter, YamlLoader};
 
-use parameter::{ParamMap, Parameter, ParameterValues};
-use processor::process_yaml;
-use secret::{Secret, Secrets};
+use crate::{
+    parameter::{ParamMap, Parameter, ParameterValues},
+    processor::process_yaml,
+    secret::{Secret, Secrets},
+};
 
 /// A Kubernetes manifest template and the values for each of its parameters.
 #[derive(Debug)]

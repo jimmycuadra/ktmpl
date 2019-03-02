@@ -72,20 +72,17 @@
 #![deny(missing_debug_implementations)]
 #![deny(missing_docs)]
 
-extern crate base64;
-#[macro_use] extern crate lazy_static;
-extern crate regex;
-extern crate yaml_rust as yaml;
-
-pub use template::Template;
-pub use parameter::{
-    ParameterValue,
-    ParameterValues,
-    parameter_values_from_file,
-    parameter_values_from_str,
-    parameter_values_from_yaml,
+pub use crate::{
+    template::Template,
+    parameter::{
+        ParameterValue,
+        ParameterValues,
+        parameter_values_from_file,
+        parameter_values_from_str,
+        parameter_values_from_yaml,
+    },
+    secret::{Secret, Secrets},
 };
-pub use secret::{Secret, Secrets};
 
 mod parameter;
 mod processor;

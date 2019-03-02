@@ -5,7 +5,7 @@ use std::io::{ErrorKind, Read};
 use std::str::FromStr;
 
 use base64::encode;
-use yaml::{Yaml, YamlLoader};
+use yaml_rust::{Yaml, YamlLoader};
 
 #[derive(Debug)]
 pub struct Parameter {

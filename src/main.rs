@@ -1,6 +1,3 @@
-extern crate clap;
-extern crate ktmpl;
-
 use std::collections::{HashMap};
 use std::error::Error;
 use std::fs::File;

@@ -104,6 +104,36 @@ mod tests {
     };
 
     #[test]
+    fn process_keys() {
+        let template_contents = r#"
+---
+objects:
+    - $(FOO): bar
+parameters:
+  - name: FOO
+    value: baz
+"#;
+        let template = Template::new(
+            template_contents.to_string(),
+            ParameterValues::new(),
+            None,
+        )
+        .unwrap();
+
+        let processed_template = template.process().unwrap();
+
+        assert_eq!(
+            processed_template
+                .lines()
+                .map(|l| l.trim_end())
+                .collect::<Vec<&str>>()
+                .join("\n"),
+            r#"---
+baz: bar"#
+        );
+    }
+
+    #[test]
     fn encode_secrets() {
         let template_contents = r#"
 ---

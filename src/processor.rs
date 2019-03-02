@@ -1,7 +1,7 @@
 use lazy_static::lazy_static;
 use regex::{Captures, Regex};
-use yaml_rust::Yaml;
 use yaml_rust::yaml::{Array, Hash};
+use yaml_rust::Yaml;
 
 use crate::parameter::ParamMap;
 
@@ -18,7 +18,7 @@ fn process_array(array: &mut Array, parameters: &ParamMap) -> Option<Yaml> {
     for value in array {
         match process_yaml(value, parameters) {
             Some(new_value) => *value = new_value,
-            _ => {},
+            _ => {}
         }
     }
 
@@ -29,7 +29,7 @@ fn process_hash(hash: &mut Hash, parameters: &ParamMap) -> Option<Yaml> {
     for (_, value) in hash {
         match process_yaml(value, parameters) {
             Some(new_value) => *value = new_value,
-            _ => {},
+            _ => {}
         }
     }
 
@@ -38,23 +38,27 @@ fn process_hash(hash: &mut Hash, parameters: &ParamMap) -> Option<Yaml> {
 
 fn process_string(string: &mut String, parameters: &ParamMap) -> Option<Yaml> {
     lazy_static! {
-        static ref LITERAL_INTERPOLATION: Regex = Regex::new(
-            r"\$\({2}([^\)]*)\){2}"
-        ).expect("Failed to compile regex.");
+        static ref LITERAL_INTERPOLATION: Regex =
+            Regex::new(r"\$\({2}([^\)]*)\){2}").expect("Failed to compile regex.");
     }
 
     lazy_static! {
-        static ref STRING_INTERPOLATION: Regex = Regex::new(
-            r"\$\(([^\)]*)\)"
-        ).expect("Failed to compile regex.");
+        static ref STRING_INTERPOLATION: Regex =
+            Regex::new(r"\$\(([^\)]*)\)").expect("Failed to compile regex.");
     }
 
     let interpolate = |captures: &Captures| -> String {
-        let key = captures.get(1).expect("Failed to extract regex capture group.");
+        let key = captures
+            .get(1)
+            .expect("Failed to extract regex capture group.");
 
         match parameters.get(key.as_str()) {
             Some(parameter) => parameter.value.clone().unwrap_or("~".to_owned()),
-            None => captures.get(0).expect("Failed to extract regex match.").as_str().to_owned(),
+            None => captures
+                .get(0)
+                .expect("Failed to extract regex match.")
+                .as_str()
+                .to_owned(),
         }
     };
 

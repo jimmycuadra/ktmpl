@@ -41,23 +41,21 @@ pub type ParameterValues = HashMap<String, ParameterValue>;
 
 /// Loads `ParameterValues` from a file.
 pub fn parameter_values_from_file(file_path: &str) -> Result<ParameterValues, String> {
-    let mut file = File::open(file_path).map_err(|err| {
-        match err.kind() {
-            ErrorKind::NotFound => format!("File not found: {}", file_path),
-            _ => err.description().to_owned(),
-        }
+    let mut file = File::open(file_path).map_err(|err| match err.kind() {
+        ErrorKind::NotFound => format!("File not found: {}", file_path),
+        _ => err.description().to_owned(),
     })?;
 
     let mut contents = String::new();
-    file.read_to_string(&mut contents).map_err(|err| err.description().to_owned())?;
+    file.read_to_string(&mut contents)
+        .map_err(|err| err.description().to_owned())?;
 
     parameter_values_from_str(&contents)
 }
 
 /// Loads `ParameterValues` from the raw contents of a parameter file.
 pub fn parameter_values_from_str(contents: &str) -> Result<ParameterValues, String> {
-    let docs = YamlLoader::load_from_str(&contents)
-        .map_err(|err| err.description().to_owned())?;
+    let docs = YamlLoader::load_from_str(&contents).map_err(|err| err.description().to_owned())?;
 
     let mut parameter_values = ParameterValues::new();
 
@@ -76,20 +74,24 @@ pub fn parameter_values_from_yaml(yaml: Yaml) -> Result<ParameterValues, String>
         Yaml::Hash(ref hash) => {
             for (key, value) in hash {
                 match *key {
-                    Yaml::String(ref key_string) => {
-                        match *value {
-                            Yaml::String(ref value_string) => {
-                                parameter_values.insert(
-                                    key_string.to_string(),
-                                    ParameterValue::Plain(value_string.to_string()),
-                                );
-                            }
-                            _ => return Err("Parameter values in parameter files must be strings.".to_string()),
+                    Yaml::String(ref key_string) => match *value {
+                        Yaml::String(ref value_string) => {
+                            parameter_values.insert(
+                                key_string.to_string(),
+                                ParameterValue::Plain(value_string.to_string()),
+                            );
                         }
+                        _ => {
+                            return Err(
+                                "Parameter values in parameter files must be strings.".to_string()
+                            )
+                        }
+                    },
+                    _ => {
+                        return Err(
+                            "Parameters names in parameter files must be strings.".to_string()
+                        )
                     }
-                    _ => return Err(
-                        "Parameters names in parameter files must be strings.".to_string()
-                    ),
                 }
             }
         }
@@ -99,7 +101,10 @@ pub fn parameter_values_from_yaml(yaml: Yaml) -> Result<ParameterValues, String>
     Ok(parameter_values)
 }
 
-fn maybe_base64_encode(parameter_type: &Option<ParameterType>, user_value: &ParameterValue) -> String {
+fn maybe_base64_encode(
+    parameter_type: &Option<ParameterType>,
+    user_value: &ParameterValue,
+) -> String {
     if parameter_type.is_none() || parameter_type.as_ref().unwrap() != &ParameterType::Base64 {
         return match *user_value {
             ParameterValue::Plain(ref value) => value.clone(),
@@ -135,26 +140,28 @@ impl Parameter {
         let value = match user_values.get(&name) {
             Some(user_value) => Some(maybe_base64_encode(&parameter_type, &user_value)),
             None => match yaml["value"] {
-                Yaml::Boolean(ref value)  => Some(format!("{}", value)),
+                Yaml::Boolean(ref value) => Some(format!("{}", value)),
                 Yaml::Integer(ref value) => Some(format!("{}", value)),
                 Yaml::String(ref value) => Some(value.clone()),
-                _ => if required {
-                    return Err(
-                        format!(
+                _ => {
+                    if required {
+                        return Err(format!(
                             "Parameter {} required and must be {}",
                             display_name.unwrap_or(name),
-                            parameter_type.map(|pt| match pt {
-                                ParameterType::Base64 => "base64",
-                                ParameterType::Bool => "a bool",
-                                ParameterType::Int => "an int",
-                                ParameterType::String => "a string"
-                            }).unwrap_or("base64, bool, int, or string")
-                        )
-                    )
-                } else {
-                    None
-                },
-            }
+                            parameter_type
+                                .map(|pt| match pt {
+                                    ParameterType::Base64 => "base64",
+                                    ParameterType::Bool => "a bool",
+                                    ParameterType::Int => "an int",
+                                    ParameterType::String => "a string",
+                                })
+                                .unwrap_or("base64, bool, int, or string")
+                        ));
+                    } else {
+                        None
+                    }
+                }
+            },
         };
 
         Ok(Parameter {

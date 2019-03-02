@@ -1,18 +1,18 @@
-use std::collections::{HashMap};
+use std::collections::HashMap;
 use std::error::Error;
 use std::fs::File;
-use std::io::{ErrorKind, Read, stdin};
+use std::io::{stdin, ErrorKind, Read};
 use std::process::exit;
 
 use clap::{App, AppSettings, Arg, Values};
 
 use ktmpl::{
+    parameter_values_from_file,
     ParameterValue,
     ParameterValues,
     Secret,
     Secrets,
     Template,
-    parameter_values_from_file,
 };
 
 fn main() {
@@ -33,7 +33,7 @@ fn real_main() -> Result<(), String> {
             Arg::with_name("template")
                 .help("Path to the template file to be processed (use \"-\" to read from stdin)")
                 .required(true)
-                .index(1)
+                .index(1),
         )
         .arg(
             Arg::with_name("parameter")
@@ -44,7 +44,7 @@ fn real_main() -> Result<(), String> {
                 .multiple(true)
                 .takes_value(true)
                 .number_of_values(2)
-                .value_names(&["NAME", "VALUE"])
+                .value_names(&["NAME", "VALUE"]),
         )
         .arg(
             Arg::with_name("base64-parameter")
@@ -55,7 +55,7 @@ fn real_main() -> Result<(), String> {
                 .multiple(true)
                 .takes_value(true)
                 .number_of_values(2)
-                .value_names(&["NAME", "VALUE"])
+                .value_names(&["NAME", "VALUE"]),
         )
         .arg(
             Arg::with_name("secret")
@@ -66,7 +66,7 @@ fn real_main() -> Result<(), String> {
                 .multiple(true)
                 .takes_value(true)
                 .number_of_values(2)
-                .value_names(&["NAME", "NAMESPACE"])
+                .value_names(&["NAME", "NAMESPACE"]),
         )
         .arg(
             Arg::with_name("parameter-file")
@@ -77,7 +77,7 @@ fn real_main() -> Result<(), String> {
                 .multiple(true)
                 .takes_value(true)
                 .number_of_values(1)
-                .value_names(&["PARAMETER_FILE"])
+                .value_names(&["PARAMETER_FILE"]),
         )
         .get_matches();
 
@@ -104,19 +104,22 @@ fn real_main() -> Result<(), String> {
         .and_then(|secrets| Some(secret_values(secrets)))
         .or(None);
 
-    let filename = matches.value_of("template").expect("template wasn't provided");
+    let filename = matches
+        .value_of("template")
+        .expect("template wasn't provided");
     let mut template_data = String::new();
 
     if filename == "-" {
-        stdin().read_to_string(&mut template_data).map_err(|err| err.description().to_owned())?;
+        stdin()
+            .read_to_string(&mut template_data)
+            .map_err(|err| err.description().to_owned())?;
     } else {
-        let mut file = File::open(filename).map_err(|err| {
-            match err.kind() {
-                ErrorKind::NotFound => format!("File not found: {}", filename),
-                _ => err.description().to_owned(),
-            }
+        let mut file = File::open(filename).map_err(|err| match err.kind() {
+            ErrorKind::NotFound => format!("File not found: {}", filename),
+            _ => err.description().to_owned(),
         })?;
-        file.read_to_string(&mut template_data).map_err(|err| err.description().to_owned())?;
+        file.read_to_string(&mut template_data)
+            .map_err(|err| err.description().to_owned())?;
     }
 
     let template = Template::new(template_data, values, secrets)?;
@@ -174,7 +177,9 @@ fn secret_values(mut secret_parameters: Values) -> Secrets {
 
     loop {
         if let Some(name) = secret_parameters.next() {
-            let namespace = secret_parameters.next().expect("Secret was missing its namespace.");
+            let namespace = secret_parameters
+                .next()
+                .expect("Secret was missing its namespace.");
 
             secrets.insert(Secret {
                 name: name.to_string(),

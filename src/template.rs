@@ -59,7 +59,7 @@ impl Template {
         let mut template_objects = vec![];
         let objects = match doc["objects"].as_vec() {
             Some(objects) => objects,
-            None => return Err("Key \"objects\" must be present and must be an array.".to_owned())
+            None => return Err("Key \"objects\" must be present and must be an array.".to_owned()),
         };
 
         for object in objects {
@@ -69,7 +69,9 @@ impl Template {
         let mut param_map = ParamMap::new();
         let parameter_specs = match doc["parameters"].as_vec() {
             Some(parameter_specs) => parameter_specs,
-            None => return Err("Key \"parameters\" must be present and must be an array.".to_owned())
+            None => {
+                return Err("Key \"parameters\" must be present and must be an array.".to_owned())
+            }
         };
 
         for parameter_spec in parameter_specs {
@@ -112,11 +114,9 @@ impl Template {
 
         dump(self.objects)
     }
-
 }
 
-fn maybe_base64_encode_secret(secrets: &Secrets, object: &mut Yaml)
--> Result<bool, String> {
+fn maybe_base64_encode_secret(secrets: &Secrets, object: &mut Yaml) -> Result<bool, String> {
     let hash = match object {
         &mut Yaml::Hash(ref mut hash) => hash,
         _ => return Ok(false),
@@ -129,9 +129,12 @@ fn maybe_base64_encode_secret(secrets: &Secrets, object: &mut Yaml)
                     return Ok(false);
                 }
             }
-            _ => return Err(
-                "Encountered a resource with a non-string value for the \"kind\" field.".to_string()
-            ),
+            _ => {
+                return Err(
+                    "Encountered a resource with a non-string value for the \"kind\" field."
+                        .to_string(),
+                )
+            }
         }
     } else {
         return Err("Encountered a resource without a \"kind\" field.".to_string());
@@ -139,29 +142,30 @@ fn maybe_base64_encode_secret(secrets: &Secrets, object: &mut Yaml)
 
     let metadata = match hash.get(&Yaml::String("metadata".to_string())) {
         Some(&Yaml::Hash(ref metadata)) => metadata.clone(),
-        Some(_) => return Err(
-            "Encountered a resource with a non-hash \"metadata\" field.".to_string()
-        ),
-        None => return Err(
-            "Encountered a resource without a \"metadata\" field.".to_string()
-        ),
+        Some(_) => {
+            return Err("Encountered a resource with a non-hash \"metadata\" field.".to_string())
+        }
+        None => return Err("Encountered a resource without a \"metadata\" field.".to_string()),
     };
 
     let name = match metadata.get(&ystring("name")) {
         Some(&Yaml::String(ref name)) => name.to_string(),
-        Some(_) => return Err(
-            "Encountered a resource with a non-string \"metadata.name\" field.".to_string()
-        ),
-        None => return Err(
-            "Encountered a resource without a \"metadata.name\" field.".to_string()
-        ),
+        Some(_) => {
+            return Err(
+                "Encountered a resource with a non-string \"metadata.name\" field.".to_string(),
+            )
+        }
+        None => return Err("Encountered a resource without a \"metadata.name\" field.".to_string()),
     };
 
     let namespace = match metadata.get(&ystring("namespace")) {
         Some(&Yaml::String(ref namespace)) => namespace.to_string(),
-        Some(_) => return Err(
-            "Encountered a resource with a non-string \"metadata.namespace\" field.".to_string()
-        ),
+        Some(_) => {
+            return Err(
+                "Encountered a resource with a non-string \"metadata.namespace\" field."
+                    .to_string(),
+            )
+        }
         None => "default".to_string(),
     };
 
@@ -177,9 +181,7 @@ fn maybe_base64_encode_secret(secrets: &Secrets, object: &mut Yaml)
                     base64_encode_secret_data(data_hash)?;
                     return Ok(true);
                 }
-                _ => return Err(
-                    "Encountered secret with non-hash \"data\" field.".to_string()
-                ),
+                _ => return Err("Encountered secret with non-hash \"data\" field.".to_string()),
             }
         }
     }
@@ -206,11 +208,9 @@ fn dump(objects: Vec<Yaml>) -> Result<String, String> {
     for (i, object) in objects.iter().enumerate() {
         {
             let mut emitter = YamlEmitter::new(&mut manifests);
-            emitter.dump(&object).map_err(|error| {
-                match error {
-                    EmitError::FmtError(error) => format!("{}", error),
-                    EmitError::BadHashmapKey => "Bad hashmap key in YAML structure.".to_owned(),
-                }
+            emitter.dump(&object).map_err(|error| match error {
+                EmitError::FmtError(error) => format!("{}", error),
+                EmitError::BadHashmapKey => "Bad hashmap key in YAML structure.".to_owned(),
             })?;
         }
 

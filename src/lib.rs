@@ -73,15 +73,15 @@
 #![deny(missing_docs)]
 
 pub use crate::{
-    template::Template,
     parameter::{
-        ParameterValue,
-        ParameterValues,
         parameter_values_from_file,
         parameter_values_from_str,
         parameter_values_from_yaml,
+        ParameterValue,
+        ParameterValues,
     },
     secret::{Secret, Secrets},
+    template::Template,
 };
 
 mod parameter;
@@ -95,12 +95,12 @@ mod tests {
     use std::io::Read;
 
     use super::{
+        parameter_values_from_file,
         ParameterValue,
         ParameterValues,
         Secret,
         Secrets,
         Template,
-        parameter_values_from_file,
     };
 
     #[test]
@@ -146,12 +146,17 @@ parameters:
             template_contents.to_string(),
             parameter_values,
             Some(secrets),
-        ).unwrap();
+        )
+        .unwrap();
 
         let processed_template = template.process().unwrap();
 
         assert_eq!(
-            processed_template.lines().map(|l| l.trim_end()).collect::<Vec<&str>>().join("\n"),
+            processed_template
+                .lines()
+                .map(|l| l.trim_end())
+                .collect::<Vec<&str>>()
+                .join("\n"),
             r#"---
 kind: Secret
 apiVersion: v1
@@ -201,7 +206,8 @@ parameters:
             template_contents.to_string(),
             parameter_values,
             Some(secrets),
-        ).unwrap();
+        )
+        .unwrap();
 
         assert!(template.process().is_err());
     }
@@ -211,20 +217,23 @@ parameters:
         let mut template_file = File::open("example.yml").unwrap();
         let mut template_contents = String::new();
 
-        template_file.read_to_string(&mut template_contents).unwrap();
+        template_file
+            .read_to_string(&mut template_contents)
+            .unwrap();
 
         let parameter_values = parameter_values_from_file("params.yml").unwrap();
 
-        let template = Template::new(
-            template_contents.to_string(),
-            parameter_values,
-            None,
-        ).unwrap();
+        let template =
+            Template::new(template_contents.to_string(), parameter_values, None).unwrap();
 
         let processed_template = template.process().unwrap();
 
         assert_eq!(
-            processed_template.lines().map(|l| l.trim_end()).collect::<Vec<&str>>().join("\n"),
+            processed_template
+                .lines()
+                .map(|l| l.trim_end())
+                .collect::<Vec<&str>>()
+                .join("\n"),
             r#"---
 kind: Service
 apiVersion: v1

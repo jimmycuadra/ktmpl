@@ -154,7 +154,7 @@ parameters:
         let processed_template = template.process().unwrap();
 
         assert_eq!(
-            processed_template.lines().map(|l| l.trim_right()).collect::<Vec<&str>>().join("\n"),
+            processed_template.lines().map(|l| l.trim_end()).collect::<Vec<&str>>().join("\n"),
             r#"---
 kind: Secret
 apiVersion: v1
@@ -227,7 +227,7 @@ parameters:
         let processed_template = template.process().unwrap();
 
         assert_eq!(
-            processed_template.lines().map(|l| l.trim_right()).collect::<Vec<&str>>().join("\n"),
+            processed_template.lines().map(|l| l.trim_end()).collect::<Vec<&str>>().join("\n"),
             r#"---
 kind: Service
 apiVersion: v1
@@ -257,7 +257,7 @@ spec:
     spec:
       containers:
         - name: mongodb
-          image: "docker.io/centos/mongodb-26-centos7"
+          image: docker.io/centos/mongodb-26-centos7
           ports:
             - containerPort: 27017
               protocol: TCP

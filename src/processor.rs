@@ -16,9 +16,8 @@ pub fn process_yaml(yaml: &mut Yaml, parameters: &ParamMap) -> Option<Yaml> {
 
 fn process_array(array: &mut Array, parameters: &ParamMap) -> Option<Yaml> {
     for value in array {
-        match process_yaml(value, parameters) {
-            Some(new_value) => *value = new_value,
-            _ => {}
+        if let Some(new_value) = process_yaml(value, parameters) {
+            *value = new_value;
         }
     }
 
@@ -26,11 +25,28 @@ fn process_array(array: &mut Array, parameters: &ParamMap) -> Option<Yaml> {
 }
 
 fn process_hash(hash: &mut Hash, parameters: &ParamMap) -> Option<Yaml> {
-    for (_, value) in hash {
-        match process_yaml(value, parameters) {
-            Some(new_value) => *value = new_value,
-            _ => {}
+    let mut keys_to_replace = Vec::new();
+
+    for (key, value) in hash.iter_mut() {
+        let mut key_string = match key {
+            Yaml::String(key_string) => key_string.clone(),
+            _ => panic!("all hash keys must be strings"),
+        };
+
+        if let Some(new_key) = process_string(&mut key_string, parameters) {
+            if &new_key != key {
+                keys_to_replace.push((key.clone(), new_key));
+            }
         }
+
+        if let Some(new_value) = process_yaml(value, parameters) {
+            *value = new_value;
+        }
+    }
+
+    for (key, new_key) in keys_to_replace {
+        let value = hash.remove(&key).expect("removing old value while replacing keys");
+        hash.insert(new_key, value);
     }
 
     None
